@@ -16,6 +16,7 @@ import {
   FormMessage,
   FormControl,
 } from "@/components/ui/form";
+import GoogleSignInButton from "../google-sign-in";
 
 export default function AdminSigninForm() {
   const [error, setError] = useState<string | undefined>();
@@ -45,57 +46,61 @@ export default function AdminSigninForm() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  className="rounded-sm"
-                  type="email"
-                  placeholder="admin@example.com"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+    <section className="flex min-h-screen items-center justify-center">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    className="rounded-sm"
+                    type="email"
+                    placeholder="admin@example.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    className="rounded-sm"
+                    type="password"
+                    placeholder="••••••••"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {error && (
+            <p className="text-center text-sm font-medium text-red-500">
+              {error}
+            </p>
           )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  className="rounded-sm"
-                  type="password"
-                  placeholder="••••••••"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {error && (
-          <p className="text-center text-sm font-medium text-red-500">
-            {error}
-          </p>
-        )}
-        <LoadingButton
-          isLoading={isPending}
-          type="submit"
-          className="w-full rounded-sm"
-        >
-          Sign in
-        </LoadingButton>
-      </form>
-    </Form>
+
+          <LoadingButton
+            isLoading={isPending}
+            type="submit"
+            className="w-full rounded-sm"
+          >
+            Sign in
+          </LoadingButton>
+          <GoogleSignInButton className="w-full" />
+        </form>
+      </Form>
+    </section>
   );
 }

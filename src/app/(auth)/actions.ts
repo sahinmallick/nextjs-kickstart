@@ -72,7 +72,6 @@ export async function SignUp(cred: SignUpValues): Promise<{ error: string }> {
         error: "Email already exists",
       };
     }
-    await prisma.session.deleteMany();
 
     const hashPass = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
@@ -98,7 +97,7 @@ export async function SignUp(cred: SignUpValues): Promise<{ error: string }> {
   }
 }
 
-export async function signOut() {
+export async function logOut() {
   const { session } = await validateRequest();
   if (!session) throw new Error("Unauthorized");
   await lucia.invalidateSession(session.id);
