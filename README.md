@@ -40,6 +40,15 @@ GOOGLE_CLIENT_SECRET="your_google_oauth_client_secret"
 1. Create Google OAuth Credentials
 2. Configure Google OAuth Consent Screen
 3. Enable OAuth API
+   - For "Authorized Domains" use:
+     ```
+     http://localhost:3000
+     ```
+   - For "Authorized redirect URIs" use:
+     ```
+     http://localhost:3000/api/auth/callback/google
+     ```
+   - Copy Client Id and Client Secret and paste it into .env
 
 ## Available Scripts
 
