@@ -20,7 +20,7 @@ Clone the repository and install dependencies:
 ```sh
 git clone https://github.com/yourusername/gist.git
 cd gist
-npm install
+npm install --legacy-peer-deps --force
 ```
 
 ## Environment Variables
