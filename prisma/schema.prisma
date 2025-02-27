@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "mongodb"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid()) @map("_id")
+  displayName  String
+  email        String    @unique
+  passwordHash String?
+  googleId     String?
+  image        String?
+  sessions     Session[]
+  plan         Plan      @default(FREE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum Plan {
+  FREE
+  PRO
+  PREMIUM
+}
+
+model Session {
+  id        String   @id @default(uuid()) @map("_id")
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Log {
+  id     String  @id @default(uuid()) @map("_id")
+  name   String
+  userId String?
+  value  Json
+
+  @@map("logs")
+}
