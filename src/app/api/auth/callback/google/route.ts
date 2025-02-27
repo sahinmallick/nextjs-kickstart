@@ -41,7 +41,6 @@ export async function GET(req: NextRequest) {
       picture: string;
     };
 
-    console.log({ googleUser });
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [
@@ -101,7 +100,7 @@ export async function GET(req: NextRequest) {
       });
     }
   } catch (error) {
-    console.log("Google callback error: ", { error });
+    console.error("Google callback error: ", { error });
     if (error instanceof OAuth2RequestError) {
       return new Response(null, {
         status: 400,
