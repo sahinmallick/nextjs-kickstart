@@ -1,13 +1,18 @@
 "use client";
 
 import { signupSchema, type SignUpValues } from "@/lib/validation";
+import GoogleSignInButton from "../sign-in/google/google-sign-in";
+import GithubSignInButton from "../sign-in/github/github-sign-in";
 import { LoadingButton } from "@/components/loading-button";
+import { LockIcon, MailIcon, UserIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Separator } from "@/components/ui/separator";
 import { useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { SignUp } from "../actions";
 import { toast } from "sonner";
+import Link from "next/link";
 import {
   Form,
   FormItem,
@@ -16,6 +21,14 @@ import {
   FormMessage,
   FormControl,
 } from "@/components/ui/form";
+import {
+  Card,
+  CardTitle,
+  CardFooter,
+  CardHeader,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 
 export default function AdminSignupForm() {
   const [error, setError] = useState<string | undefined>();
@@ -39,66 +52,137 @@ export default function AdminSignupForm() {
         toast.error("Sign up failed", { description: error });
       } else {
         toast.success("Signed up successfully");
-        // Redirect or update UI as needed
       }
     });
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="displayName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Display Name</FormLabel>
-              <FormControl>
-                <Input type="text" placeholder="John Doe" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder="admin@example.com"
-                  {...field}
+    <section className="flex min-h-screenNav items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-center text-2xl font-bold">
+            Sign Up
+          </CardTitle>
+          <CardDescription className="text-center">
+            Create your account to get started
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="displayName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <UserIcon className="h-4 w-4" />
+                      Display Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="rounded-md border-input"
+                        type="text"
+                        placeholder="Tapu ke papa"
+                        {...field}
+                        required
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <MailIcon className="h-4 w-4" />
+                      Email
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="rounded-md border-input"
+                        type="email"
+                        placeholder="user@example.com"
+                        {...field}
+                        required
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <LockIcon className="h-4 w-4" />
+                      Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="rounded-md border-input"
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                        required
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {error && (
+                <div className="rounded-md bg-destructive/10 p-3">
+                  <p className="text-center text-sm font-medium text-destructive">
+                    {error}
+                  </p>
+                </div>
+              )}
+
+              <LoadingButton
+                isLoading={isPending}
+                type="submit"
+                className="w-full rounded-md font-semibold"
+                variant={"basic"}
+              >
+                Sign up
+              </LoadingButton>
+
+              <div className="relative my-4">
+                <Separator />
+                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+                  OR
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <GoogleSignInButton
+                  variant={"basic"}
+                  className="w-full rounded-md font-semibold"
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {error && (
-          <p className="text-center text-sm font-medium text-red-500">
-            {error}
+                <GithubSignInButton
+                  variant={"basic"}
+                  className="w-full rounded-md font-semibold"
+                />
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter className="flex justify-center text-sm font-medium">
+          <p>
+            Already have an account?{" "}
+            <Link href="/sign-in" className="text-primary hover:underline">
+              Sign in
+            </Link>
           </p>
-        )}
-        <LoadingButton isLoading={isPending} type="submit" className="w-full">
-          Sign up
-        </LoadingButton>
-      </form>
-    </Form>
+        </CardFooter>
+      </Card>
+    </section>
   );
 }

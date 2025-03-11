@@ -1,17 +1,17 @@
 "use client";
 import { Button, ButtonProps } from "@/components/ui/button";
-import { logOut } from "./actions";
+import { SignOut } from "./actions";
 
-interface LogOutButtonProps extends ButtonProps {
+interface SignOutButtonProps extends ButtonProps {
   children?: React.ReactNode;
 }
 
-export default function LogOutButton({
+export default function SignOutButton({
   children,
   ...props
-}: LogOutButtonProps) {
+}: SignOutButtonProps) {
   return (
-    <Button onClick={() => logOut()} {...props}>
+    <Button onClick={() => SignOut()} {...props}>
       {children || "Log out"}
     </Button>
   );

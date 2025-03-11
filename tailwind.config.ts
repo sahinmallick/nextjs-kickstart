@@ -12,6 +12,10 @@ export default {
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        basic: {
+          DEFAULT: "hsl(var(--basic))",
+          foreground: "hsl(var(--basic-foreground))",
+        },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -55,6 +59,15 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      height: {
+        screenNav: "calc(100vh - 64px)",
+      },
+      minHeight: {
+        screenNav: "calc(100vh - 64px)",
+      },
+      maxHeight: {
+        screenNav: "calc(100vh - 64px)",
       },
     },
   },

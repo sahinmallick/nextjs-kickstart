@@ -14,20 +14,13 @@ model User {
   email        String    @unique
   passwordHash String?
   googleId     String?   @unique
+  githubId     String?   @unique
   image        String?
   sessions     Session[]
-  plan         Plan      @default(FREE)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@map("users")
-}
-
-enum Plan {
-  FREE
-  PRO
-  PREMIUM
 }
 
 model Session {
@@ -40,10 +33,12 @@ model Session {
 }
 
 model Log {
-  id     String  @id @default(uuid()) @map("_id")
-  name   String
-  userId String?
-  value  Json
+  id        String   @id @default(uuid()) @map("_id")
+  name      String
+  userId    String?
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("logs")
 }

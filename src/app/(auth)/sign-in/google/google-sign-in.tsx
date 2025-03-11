@@ -7,12 +7,17 @@ interface GoogleSignInButtonProps extends ButtonProps {
 }
 
 export default function GoogleSignInButton({
+  children,
   ...props
 }: GoogleSignInButtonProps) {
   return (
     <Button asChild {...props}>
       <Link href={`/sign-in/google`}>
-        <GoogleSvg /> Sign in with Google
+        {children || (
+          <>
+            <GoogleSvg /> Sign in with Google
+          </>
+        )}
       </Link>
     </Button>
   );

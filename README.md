@@ -1,13 +1,13 @@
 # Next.js Kickstart
 
-This is a Next.js 15.2 starter template designed to accelerate project setup. It includes Prisma ORM, Lucia authentication (server session), and built-in support for Google and credential-based login.
+This is a Next.js 15.2 starter template designed to accelerate project setup. It includes Prisma ORM, Lucia authentication (server session), and built-in support for Google, GitHub, and credential-based login.
 
 ## Features
 
 - **Next.js 15.2** - The latest Next.js version for optimal performance
 - **Prisma ORM** - Database management with an easy-to-use schema and migrations
 - **Lucia Auth** - Secure authentication with server sessions
-- **Google & Credential Login** - Pre-configured authentication strategies
+- **Google, GitHub & Credential Login** - Pre-configured authentication strategies
 - **Tailwind CSS** - Modern styling with utility-first approach
 - **ESLint & Prettier** - Code quality and formatting enforced out-of-the-box
 - **ShadCN UI** - Accessible UI primitives for better user experience
@@ -33,6 +33,8 @@ DATABASE_URL="your_database_url"
 DIRECT_DATABASE_URL="your_raw_database_url_without_params"
 GOOGLE_CLIENT_ID="your_google_oauth_client_id"
 GOOGLE_CLIENT_SECRET="your_google_oauth_client_secret"
+GITHUB_CLIENT_ID="your_github_oauth_client_id"
+GITHUB_CLIENT_SECRET="your_github_oauth_client_secret"
 ```
 
 ## Google OAuth Setup
@@ -40,15 +42,25 @@ GOOGLE_CLIENT_SECRET="your_google_oauth_client_secret"
 1. Create Google OAuth Credentials
 2. Configure Google OAuth Consent Screen
 3. Enable OAuth API
-   - For "Authorized Domains" use:
-     ```
-     http://localhost:3000
-     ```
-   - For "Authorized redirect URIs" use:
-     ```
-     http://localhost:3000/api/auth/callback/google
-     ```
-   - Copy Client Id and Client Secret and paste it into .env
+  - For "Authorized Domains" use:
+    ```
+    http://localhost:3000
+    ```
+  - For "Authorized redirect URIs" use:
+    ```
+    http://localhost:3000/api/auth/callback/google
+    ```
+  - Copy Client Id and Client Secret and paste it into .env
+
+## GitHub OAuth Setup
+
+1. Create GitHub OAuth App
+2. Configure GitHub OAuth settings
+  - For "Authorization callback URL" use:
+    ```
+    http://localhost:3000/api/auth/callback/github
+    ```
+  - Copy Client Id and Client Secret and paste it into .env
 
 ## Available Scripts
 
@@ -91,3 +103,4 @@ npm run freshbuild:linux
 ## License
 
 This project is licensed under the MIT License.
+

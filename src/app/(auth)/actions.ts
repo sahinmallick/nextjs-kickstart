@@ -21,17 +21,17 @@ export async function SignIn(cred: SignInValues): Promise<{ error: string }> {
       },
     });
 
-    if (!user || !user?.passwordHash) {
+    if (!user)
       return {
-        error: "Incorrect username or password",
+        error: "User not found with this email",
       };
-    }
-    const validPass = await bcrypt.compare(password, user.passwordHash);
-    if (!validPass) {
+
+    const validPass = await bcrypt.compare(password, user.passwordHash!);
+    if (!validPass)
       return {
         error: "Incorrect password",
       };
-    }
+
     const session = await lucia.createSession(user.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
     const cookieSet = await cookies();
@@ -40,7 +40,6 @@ export async function SignIn(cred: SignInValues): Promise<{ error: string }> {
       sessionCookie.value,
       sessionCookie.attributes,
     );
-    return redirect("/");
   } catch (error) {
     console.error("Signin error", error);
     if (isRedirectError(error)) throw error;
@@ -48,6 +47,7 @@ export async function SignIn(cred: SignInValues): Promise<{ error: string }> {
       error: "Something went wrong",
     };
   }
+  return redirect("/profile");
 }
 
 export async function SignUp(cred: SignUpValues): Promise<{ error: string }> {
@@ -89,15 +89,15 @@ export async function SignUp(cred: SignUpValues): Promise<{ error: string }> {
       sessionCookie.value,
       sessionCookie.attributes,
     );
-    return redirect("/");
   } catch (error) {
     if (isRedirectError(error)) throw error;
     console.error("Signup error", error);
     return { error: "Something went wrong" };
   }
+  return redirect("/profile");
 }
 
-export async function logOut() {
+export async function SignOut() {
   const { session } = await validateRequest();
   if (!session) throw new Error("Unauthorized");
   await lucia.invalidateSession(session.id);
@@ -108,5 +108,5 @@ export async function logOut() {
     sessionCookie.value,
     sessionCookie.attributes,
   );
-  return redirect("/");
+  return redirect("/sign-in");
 }

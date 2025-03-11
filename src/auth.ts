@@ -1,16 +1,15 @@
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
-import { Lucia, Session, User } from "lucia";
+import { Lucia, Session, TimeSpan, User } from "lucia";
+import { GitHub, Google } from "arctic";
 import { cookies } from "next/headers";
-import { Plan } from "@prisma/client";
 import prisma from "./lib/prisma";
-import { Google } from "arctic";
 import { cache } from "react";
 
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
-    expires: false,
+    expires: true,
     attributes: {
       secure: process.env.NODE_ENV === "production",
     },
@@ -18,6 +17,7 @@ export const lucia = new Lucia(adapter, {
   getUserAttributes(databaseUserAttributes) {
     return { ...databaseUserAttributes };
   },
+  sessionExpiresIn: new TimeSpan(1, "w"),
 });
 
 declare module "lucia" {
@@ -31,15 +31,20 @@ interface DatabaseUserAttributes {
   id: string;
   displayName: string;
   email: string;
-  plan: Plan;
   image: string | null;
   googleId: string | null;
+  githubId: string | null;
 }
 
 export const google = new Google(
   process.env.GOOGLE_CLIENT_ID!,
   process.env.GOOGLE_CLIENT_SECRET!,
   `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback/google`,
+);
+export const github = new GitHub(
+  process.env.GITHUB_CLIENT_ID!,
+  process.env.GITHUB_CLIENT_SECRET!,
+  null,
 );
 
 type validateRequestType =

@@ -1,6 +1,6 @@
 import { OAuth2RequestError } from "arctic";
 import { NextRequest } from "next/server";
-import { google, lucia } from "@/auth";
+import { github, lucia } from "@/auth";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
 
@@ -10,57 +10,68 @@ export async function GET(req: NextRequest) {
 
   const cookieSet = await cookies();
   const storedState = cookieSet.get("state")?.value;
-  const storedCodeVerifier = cookieSet.get("code_verifier")?.value;
 
-  if (
-    !code ||
-    !state ||
-    !storedState ||
-    !storedCodeVerifier ||
-    state !== storedState
-  )
+  if (!code || !state || !storedState || state !== storedState)
     return new Response(null, { status: 400 });
+
   try {
-    const tokens = await google.validateAuthorizationCode(
-      code,
-      storedCodeVerifier,
-    );
-    const response = await fetch(
-      "https://www.googleapis.com/oauth2/v1/userinfo",
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${tokens.accessToken()}`,
-        },
+    const tokens = await github.validateAuthorizationCode(code);
+
+    const userPromise = fetch("https://api.github.com/user", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${tokens.accessToken()}`,
       },
-    );
-    const googleUser = (await response.json()) as {
-      id: string;
-      name: string;
-      email: string;
-      picture: string;
-    };
+    });
+    const emailsPromise = fetch("https://api.github.com/user/emails", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${tokens.accessToken()}`,
+      },
+    });
+
+    const [userResponse, emailsResponse] = await Promise.all([
+      userPromise,
+      emailsPromise,
+    ]);
+
+    const [githubUser, emails] = (await Promise.all([
+      userResponse.json(),
+      emailsResponse.json(),
+    ])) as [
+      { id: number; name: string; avatar_url: string },
+      { email: string; primary: boolean }[],
+    ];
+
+    const userEmail = emails.find((e) => e.primary)?.email || emails[0]?.email;
+
+    if (!userEmail) {
+      return new Response("Unable to retrieve email from GitHub", {
+        status: 400,
+      });
+    }
 
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [
           {
-            googleId: googleUser.id,
+            githubId: String(githubUser.id),
           },
           {
-            email: googleUser.email,
+            email: userEmail,
           },
         ],
       },
     });
+
     if (existingUser) {
       await prisma.user.update({
         where: {
           email: existingUser.email,
         },
         data: {
-          googleId: googleUser.id,
-          image: googleUser.picture.replace("s96-c", "s0"),
+          githubId: String(githubUser.id),
+          image: githubUser.avatar_url,
         },
       });
       const session = await lucia.createSession(existingUser.id, {});
@@ -79,15 +90,14 @@ export async function GET(req: NextRequest) {
     } else {
       const user = await prisma.user.create({
         data: {
-          displayName: googleUser.name,
-          email: googleUser.email,
-          googleId: googleUser.id,
-          image: googleUser.picture.replace("s96-c", "s0"),
+          displayName: githubUser.name || `User-${githubUser.id}`,
+          email: userEmail,
+          githubId: String(githubUser.id),
+          image: githubUser.avatar_url,
         },
       });
       const session = await lucia.createSession(user.id, {});
       const sessionCookie = lucia.createSessionCookie(session.id);
-      const cookieSet = await cookies();
       cookieSet.set(
         sessionCookie.name,
         sessionCookie.value,
@@ -101,7 +111,7 @@ export async function GET(req: NextRequest) {
       });
     }
   } catch (error) {
-    console.error("Google callback error: ", { error });
+    console.error("Github callback error: ", { error });
     if (error instanceof OAuth2RequestError) {
       return new Response(null, {
         status: 400,
