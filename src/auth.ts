@@ -5,6 +5,8 @@ import { cookies } from "next/headers";
 import prisma from "./lib/prisma";
 import { cache } from "react";
 
+// this is changed by sahin
+
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
 export const lucia = new Lucia(adapter, {
